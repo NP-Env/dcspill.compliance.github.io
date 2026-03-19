@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Data Center Environmental Compliance Reference</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --navy:#0A0F1E;--teal:#00B896;--tdim:#00B89610;--tmid:#00B89628;
+  --blue:#2563EB;--bdim:#2563EB0E;--bmid:#2563EB25;
+  --amber:#D97706;--adim:#D9770610;--amid:#D9770628;
+  --red:#E11D48;--green:#059669;--purple:#7C3AED;--gray:#6B7280;
+  --az:#B83A00;--azdim:#B83A0010;--azmid:#B83A0030;--azbg:#FFFAF7;
+  --bg:#F8FAFC;--sur:#fff;--sur2:#F1F5F9;
+  --brd:#E2E8F0;--brd2:#CBD5E1;--t1:#0F172A;--t2:#475569;--t3:#94A3B8;
+  --mn:monospace;
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:13px;background:#eef2f7;display:flex;justify-content:center;padding:20px;}
+.portal{width:100%;max-width:1300px;border-radius:16px;overflow:hidden;border:1px solid var(--brd);background:var(--bg);box-shadow:0 4px 24px rgba(0,0,0,.08);}
+/* TOPBAR */
+.topbar{background:var(--navy);padding:0 20px;display:flex;align-items:center;gap:10px;min-height:60px;flex-wrap:wrap;position:relative;overflow:hidden;}
+.topbar::before{content:'';position:absolute;right:-40px;top:-50px;width:200px;height:200px;border-radius:50%;background:var(--teal);opacity:.08;pointer-events:none;}
+.logo{width:34px;height:34px;border-radius:9px;background:var(--teal);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:var(--navy);flex-shrink:0;z-index:1;}
+.topbar-ttl{font-size:14px;font-weight:700;color:#fff;z-index:1;}
+.tpr{margin-left:auto;display:flex;align-items:center;gap:8px;flex-wrap:wrap;z-index:1;}
+.slbl{font-size:10px;font-weight:700;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.06em;}
+.ssel{background:#1C2538;border:1px solid rgba(255,255,255,.18);color:#fff;font-size:12px;font-weight:600;padding:5px 24px 5px 10px;border-radius:8px;cursor:pointer;outline:none;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' fill='%2300B896' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 7px center;}
+.sbadge{font-size:10px;font-weight:700;color:var(--az);background:var(--azdim);border:1px solid var(--azmid);padding:3px 9px;border-radius:20px;display:none;}
+.pill{font-size:10px;font-weight:600;color:var(--teal);background:rgba(0,184,150,.12);border:1px solid rgba(0,184,150,.28);padding:3px 10px;border-radius:20px;font-family:var(--mn);}
+/* NAV */
+.nav{display:flex;background:var(--sur);border-bottom:1.5px solid var(--brd);padding:0 20px;overflow-x:auto;}
+.ni{display:flex;align-items:center;gap:7px;padding:11px 14px 9px;font-size:12.5px;font-weight:500;color:var(--t3);border-bottom:2.5px solid transparent;margin-bottom:-1.5px;cursor:pointer;white-space:nowrap;transition:color .15s;}
+.ni:hover{color:var(--t2);}
+.nd{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.ni[data-tab="inv"] .nd{background:var(--blue);}
+.ni[data-tab="rpt"] .nd{background:var(--amber);}
+.ni[data-tab="cer"] .nd{background:var(--teal);}
+.ni[data-tab="ref"] .nd{background:var(--gray);}
+.ni.act[data-tab="inv"]{color:var(--blue);border-bottom-color:var(--blue);}
+.ni.act[data-tab="rpt"]{color:var(--amber);border-bottom-color:var(--amber);}
+.ni.act[data-tab="cer"]{color:var(--teal);border-bottom-color:var(--teal);}
+.ni.act[data-tab="ref"]{color:var(--gray);border-bottom-color:var(--gray);}
+/* PAGES */
+.pg{display:none;padding:20px;background:var(--bg);}
+.pg.act{display:block;}
+.ph{display:flex;align-items:center;gap:10px;margin-bottom:5px;}
+.pi{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0;}
+.pi-inv{background:var(--bdim);color:var(--blue);border:1px solid var(--bmid);}
+.pi-rpt{background:var(--adim);color:var(--amber);border:1px solid var(--amid);}
+.pi-cer{background:var(--tdim);color:var(--teal);border:1px solid var(--tmid);}
+.pi-ref{background:var(--sur2);color:var(--gray);border:1px solid var(--brd);}
+.pttl{font-size:18px;font-weight:800;letter-spacing:-.04em;}
+.grad-inv{background:linear-gradient(90deg,var(--blue),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.grad-rpt{background:linear-gradient(90deg,var(--amber),var(--red));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.grad-cer{background:linear-gradient(90deg,var(--teal),var(--blue));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.ps{font-size:12px;color:var(--t3);margin:3px 0 11px;line-height:1.7;}
+.ps a{color:var(--blue);text-decoration:none;}
+.dv{height:1px;background:var(--brd);margin-bottom:13px;}
+.az-ban{background:var(--azbg);border:1px solid var(--azmid);border-left:3px solid var(--az);border-radius:9px;padding:8px 12px;margin-bottom:11px;font-size:12px;color:var(--t2);line-height:1.6;display:none;}
+.az-ban strong{color:var(--az);}
+/* STATS */
+.stats{display:flex;gap:9px;margin-bottom:13px;flex-wrap:wrap;}
+.stat{background:var(--sur);border:1px solid var(--brd);border-radius:13px;padding:12px 15px;flex:1;min-width:85px;position:relative;overflow:hidden;}
+.stat::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:13px 13px 0 0;}
+.stat-bl::after{background:linear-gradient(90deg,var(--blue),var(--purple));}
+.stat-am::after{background:linear-gradient(90deg,var(--amber),var(--red));}
+.stat-tl::after{background:linear-gradient(90deg,var(--teal),var(--green));}
+.sv{font-size:25px;font-weight:800;color:var(--t1);letter-spacing:-.05em;}
+.sl{font-size:11px;color:var(--t3);margin-top:2px;}
+/* BADGES */
+.b{display:inline-block;padding:2px 7px;border-radius:20px;font-size:11px;font-weight:600;white-space:nowrap;}
+.br{background:#FFF1F2;color:var(--red);}
+.bam{background:#FFFBEB;color:var(--amber);}
+.bg2{background:#ECFDF5;color:var(--green);}
+.bgy{background:var(--sur2);color:var(--gray);}
+.bbl{background:#EFF6FF;color:var(--blue);}
+.btl{background:#F0FDF9;color:var(--teal);}
+.bpu{background:#F5F3FF;color:var(--purple);}
+.leg{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px;align-items:center;font-size:11px;color:var(--t3);}
+/* INVENTORY TABLE */
+.tw{overflow-x:auto;border-radius:12px;border:1px solid var(--brd);}
+.it{width:100%;border-collapse:collapse;font-size:12px;background:var(--sur);}
+.it th{background:var(--navy);color:rgba(255,255,255,.65);font-weight:600;font-size:10px;padding:9px 10px;text-align:left;letter-spacing:.06em;text-transform:uppercase;}
+.it th.azt{background:#160E04;color:rgba(255,160,90,.7);}
+.it td{padding:8px 10px;border-bottom:1px solid var(--brd);color:var(--t1);vertical-align:top;line-height:1.5;}
+.it tr:last-child td{border-bottom:none;}
+.it tr:hover td{background:#FAFBFF;}
+.it tr:hover td.aztd{background:#FFF6F0;}
+.it .grp td{background:var(--sur2);font-weight:700;font-size:10px;padding:6px 10px;border-left:3px solid var(--blue);text-transform:uppercase;letter-spacing:.06em;color:var(--t2);border-top:1px solid var(--brd);}
+.aztd{background:var(--azbg);display:none;vertical-align:top;}
+.azl{list-style:none;padding:0;margin:0;font-size:11.5px;color:var(--t2);line-height:1.55;}
+.azl li{display:flex;gap:6px;margin-bottom:3px;align-items:flex-start;}
+.azl li::before{content:"\2022";color:var(--az);flex-shrink:0;line-height:1.4;}
+.sn{font-size:10.5px;color:var(--t3);display:block;margin-top:1px;}
+.azna{font-size:11px;color:var(--t3);font-style:italic;}
+.mono{font-family:var(--mn);font-size:11px;color:var(--blue);}
+/* OIL TRIGGER CELL */
+.tc{font-size:11.5px;}
+.tcb{display:flex;gap:3px;flex-wrap:wrap;margin-bottom:3px;}
+.tcr{display:flex;gap:4px;margin-bottom:2px;}
+.tcl{font-size:9px;font-weight:700;min-width:115px;color:var(--t3);flex-shrink:0;text-transform:uppercase;font-family:var(--mn);padding-top:1px;}
+.tcv{flex:1;color:var(--t2);}
+/* RQ CELL */
+.rqc{display:flex;flex-direction:column;gap:2px;}
+.rqr{display:flex;align-items:baseline;gap:4px;}
+.rqs{font-size:8.5px;font-weight:700;color:var(--t3);font-family:var(--mn);text-transform:uppercase;white-space:nowrap;flex-shrink:0;}
+.rqv{font-size:12px;font-weight:600;}
+.rqv-red{color:var(--red);}
+.rqv-amb{color:var(--amber);}
+.rqv-grn{color:var(--green);}
+.rqv-pur{color:var(--purple);}
+.rq-sub{font-size:10px;color:var(--t3);line-height:1.4;margin-top:1px;}
+.rq-cpd{font-size:11px;color:var(--t2);line-height:1.4;margin-top:4px;}
+.rqnone{font-size:11px;color:var(--t3);font-style:italic;}
+/* FN */
+.fn{font-size:12px;color:var(--t2);margin-top:8px;line-height:1.65;background:var(--sur);border:1px solid var(--brd);border-radius:9px;padding:9px 12px;border-left:3px solid var(--blue);}
+.fn-am{border-left-color:var(--amber);}
+.fn-tl{border-left-color:var(--teal);}
+.fn-az{border-left-color:var(--az);background:var(--azbg);}
+/* REPORT CARDS */
+.rc{background:var(--sur);border:1px solid var(--brd);border-radius:12px;padding:13px 15px;margin-bottom:10px;position:relative;overflow:hidden;}
+.rc::before{content:'';position:absolute;top:0;left:0;width:100%;height:3px;}
+.rc-c1::before{background:linear-gradient(90deg,var(--red),var(--amber));}
+.rc-c2::before{background:linear-gradient(90deg,var(--blue),var(--purple));}
+.rc-c3::before{background:linear-gradient(90deg,var(--amber),var(--green));}
+.rc-c4::before{background:linear-gradient(90deg,var(--teal),var(--blue));}
+.rc-c5::before{background:var(--brd2);}
+.rc-c6::before{background:linear-gradient(90deg,var(--navy),var(--blue));}
+.rc-caz::before{background:linear-gradient(90deg,var(--az),var(--amber));}
+.az-card{display:none;}
+.rh{display:flex;align-items:center;gap:9px;margin-bottom:10px;flex-wrap:wrap;}
+.rt{font-size:13px;font-weight:700;padding:5px 12px;border-radius:20px;white-space:nowrap;font-family:var(--mn);}
+.rt-c1{background:#FFF1F2;color:var(--red);}
+.rt-c2{background:#EFF6FF;color:var(--blue);}
+.rt-c3{background:#FFFBEB;color:var(--amber);}
+.rt-c4{background:#ECFDF5;color:var(--green);}
+.rt-c5{background:var(--sur2);color:var(--gray);}
+.rt-az{background:var(--azdim);color:var(--az);border:1px solid var(--azmid);}
+.rti{font-size:13.5px;font-weight:600;color:var(--t1);}
+.rtt{width:100%;border-collapse:collapse;font-size:12px;}
+.rtt td{padding:7px 9px;border-bottom:1px solid var(--bg);vertical-align:top;font-size:12px;color:var(--t1);line-height:1.6;word-break:break-word;}
+.rtt tr:last-child td{border-bottom:none;}
+.rtt td:first-child{font-weight:700;color:var(--t3);font-size:9.5px;width:14%;white-space:nowrap;text-transform:uppercase;letter-spacing:.05em;font-family:var(--mn);}
+.wr td{background:#F0F5FF;}
+.wr td:first-child{color:var(--blue);}
+.azwr td{background:var(--azbg);}
+.azwr td:first-child{color:var(--az);}
+.wrnone td:first-child{color:var(--t3);}
+.cb{background:var(--sur2);border:1px solid var(--brd);border-radius:9px;padding:7px 10px;margin-top:5px;font-size:12px;line-height:1.7;}
+.cb-az{background:var(--azbg);border-color:var(--azmid);}
+.cbe{font-weight:700;color:var(--t1);font-size:12px;margin-bottom:1px;}
+.cbd{color:var(--t2);}
+.cbd a,.cb a{color:var(--blue);text-decoration:none;}
+/* REGIONAL GRID */
+.regrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:7px;margin-top:7px;}
+.rcard{background:var(--sur2);border:1px solid var(--brd);border-radius:9px;padding:9px 11px;font-size:12px;line-height:1.7;border-top:2px solid var(--navy);}
+.rcard .rn{font-weight:700;color:var(--t1);}
+.rcard .rs{color:var(--t3);font-size:11px;}
+.rcard .rp{color:var(--blue);font-weight:600;font-family:var(--mn);}
+/* SUBSTANCE LISTS */
+.ls{margin-bottom:22px;}
+.lh{display:flex;align-items:center;gap:8px;margin-bottom:5px;padding-bottom:6px;border-bottom:2px solid var(--brd);}
+.li{width:26px;height:26px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;flex-shrink:0;}
+.li-bl{background:var(--bdim);color:var(--blue);border:1px solid var(--bmid);}
+.li-tl{background:var(--tdim);color:var(--teal);border:1px solid var(--tmid);}
+.li-am{background:var(--adim);color:var(--amber);border:1px solid var(--amid);}
+.li-gy{background:var(--sur2);color:var(--gray);border:1px solid var(--brd);}
+.lttl{font-size:13px;font-weight:700;color:var(--t1);}
+.lsub{font-size:11px;color:var(--t3);margin-top:1px;}
+.lsub a{color:var(--blue);text-decoration:none;}
+.lt2{width:100%;border-collapse:collapse;font-size:12px;background:var(--sur);}
+.lt2 th{background:var(--navy);color:rgba(255,255,255,.65);font-weight:600;font-size:10px;padding:9px 10px;text-align:left;letter-spacing:.06em;text-transform:uppercase;}
+.lt2 td{padding:8px 10px;border-bottom:1px solid var(--brd);color:var(--t1);vertical-align:middle;}
+.lt2 tr:last-child td{border-bottom:none;}
+.lt2 tr:hover td{background:#FAFBFF;}
+.lt2 .grp td{background:var(--sur2);font-weight:700;font-size:10px;padding:6px 10px;border-left:3px solid var(--teal);text-transform:uppercase;letter-spacing:.06em;color:var(--t2);border-top:1px solid var(--brd);}
+.cat{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:6px;font-size:11px;font-weight:800;font-family:var(--mn);}
+.cat-x{background:#FFF1F2;color:var(--red);}
+.cat-a{background:#FEF3C7;color:#92400E;}
+.cat-c{background:#EFF6FF;color:var(--blue);}
+.es{background:var(--sur2);border:1px dashed var(--brd2);border-radius:9px;padding:16px;text-align:center;color:var(--t3);font-size:12px;line-height:1.7;}
+.es strong{display:block;font-size:13px;color:var(--t2);margin-bottom:3px;}
+.azserc-blk{background:var(--sur);border:1px solid var(--azmid);border-radius:10px;padding:13px;display:none;margin-top:9px;}
+/* REFERENCES */
+.scard{background:var(--sur);border:1px solid var(--brd);border-radius:12px;padding:15px;}
+.rgrp{margin-bottom:14px;}
+.rgrpt{font-size:10px;font-weight:700;color:var(--t3);padding:5px 0;border-bottom:1px solid var(--brd);margin-bottom:6px;text-transform:uppercase;letter-spacing:.08em;font-family:var(--mn);}
+.rrow{display:flex;gap:8px;padding:6px 0;border-bottom:1px solid var(--bg);}
+.rrow:last-child{border-bottom:none;}
+.rno{font-size:10.5px;font-weight:700;color:var(--t3);min-width:20px;padding-top:1px;font-family:var(--mn);}
+.rb{flex:1;min-width:0;}
+.rttl2{font-size:12.5px;color:var(--t1);font-weight:600;margin-bottom:2px;}
+.rurl{font-size:11px;color:var(--blue);word-break:break-all;display:block;margin-bottom:2px;text-decoration:none;font-family:var(--mn);}
+.rdsc{font-size:11px;color:var(--t3);}
+.bup{display:inline-block;font-size:9px;font-weight:700;padding:1px 5px;border-radius:20px;margin-left:3px;vertical-align:middle;background:#FFFBEB;color:var(--amber);}
+.bpdf{display:inline-block;font-size:9px;font-weight:700;padding:1px 5px;border-radius:20px;margin-left:3px;vertical-align:middle;background:#FFF1F2;color:var(--red);}
+.baz-tag{display:inline-block;font-size:9px;font-weight:700;padding:1px 5px;border-radius:20px;margin-left:3px;vertical-align:middle;background:var(--azdim);color:var(--az);border:1px solid var(--azmid);}
+</style>
+</head>
+<body>
+<div class="portal">
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="logo">DC</div>
+  <span class="topbar-ttl">Data Center Environmental Compliance Reference</span>
+  <div class="tpr">
+    <span class="slbl">State</span>
+    <select class="ssel" id="SS" onchange="applyState(this.value)">
+      <option value="fed">Federal only</option>
+      <option value="az">Arizona (AZ)</option>
+    </select>
+    <span class="sbadge" id="SBadge">+ AZ Layer</span>
+    <a href="https://www.linkedin.com/in/nikhilapunuru/" target="_blank" style="font-size:11px;font-weight:600;color:var(--teal);background:rgba(0,184,150,.12);border:1px solid rgba(0,184,150,.28);padding:3px 10px;border-radius:20px;text-decoration:none;white-space:nowrap;z-index:1;">Contact me</a>
+    <span class="pill">40CFR &middot; 110 &middot; 112 &middot; 302 &middot; 355 &middot; Mar 2026</span>
+  </div>
+</div>
+
+<!-- NAV -->
+<div class="nav">
+  <div class="ni act" data-tab="inv" onclick="switchTab('inv',this)"><span class="nd"></span>Chemical Inventory</div>
+  <div class="ni" data-tab="rpt" onclick="switchTab('rpt',this)"><span class="nd"></span>Spill Reporting Requirements</div>
+  <div class="ni" data-tab="cer" onclick="switchTab('cer',this)"><span class="nd"></span>Regulated Substance Lists</div>
+  <div class="ni" data-tab="ref" onclick="switchTab('ref',this)"><span class="nd"></span>References</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     CHEMICAL INVENTORY
+════════════════════════════════════════════════════ -->
+<div id="pg-inv" class="pg act">
+  <div class="ph"><div class="pi pi-inv">CI</div><div class="pttl grad-inv">Chemical Inventory</div></div>
+  <div class="ps" id="inv-sub">
+    CERCLA RQ: <a href="https://www.law.cornell.edu/cfr/text/40/302.4" target="_blank">40 CFR &sect; 302.4</a> &nbsp;&middot;&nbsp;
+    EHS TPQ: <a href="https://www.law.cornell.edu/cfr/text/40/appendix-A_to_part_355" target="_blank">Part 355 App. A</a> &nbsp;&middot;&nbsp;
+    Oil spill: <a href="https://www.ecfr.gov/current/title-40/chapter-I/subchapter-D/part-110" target="_blank">Part 110</a> &amp; <a href="https://www.ecfr.gov/current/title-40/chapter-I/subchapter-D/part-112" target="_blank">Part 112</a>
+  </div>
+  <div class="az-ban" id="inv-ban">&#x1F335; <strong>Arizona layer active.</strong> AZ column shows state-specific triggers. See Spill Reporting Requirements tab for contacts and deadlines.</div>
+  <div class="dv"></div>
+  <div class="stats">
+    <div class="stat stat-bl"><div class="sv">15</div><div class="sl">Total substances tracked</div></div>
+    <div class="stat stat-am"><div class="sv">5</div><div class="sl">CERCLA-listed substances</div></div>
+    <div class="stat stat-tl"><div class="sv">5</div><div class="sl">Oil &mdash; Part 110/112 applies</div></div>
+  </div>
+  <div class="leg">
+    RQ/TPQ source labels:
+    <span class="b bgy" style="font-size:9.5px;">CERCLA &sect;302.4</span> Reportable Quantity &nbsp;
+    <span class="b bgy" style="font-size:9.5px;">EPCRA App.A TPQ</span> Threshold Planning Qty &nbsp;&middot;&nbsp;
+    Oil spill: <span class="b bbl">Navigable waters</span><span class="b btl">Shorelines</span><span class="b bpu">via MS4</span>
+  </div>
+  <div class="tw">
+  <table class="it">
+    <thead>
+      <tr>
+        <th style="min-width:105px;">Substance</th>
+        <th style="min-width:120px;">Chemical name</th>
+        <th style="min-width:90px;">Typical use</th>
+        <th style="min-width:160px;">Reportable quantity / TPQ<br><span style="font-weight:400;font-size:9px;text-transform:none;letter-spacing:0;">source &amp; statutory basis labeled per row</span></th>
+        <th style="min-width:250px;">Federal oil spill trigger<br><span style="font-weight:400;font-size:9px;text-transform:none;letter-spacing:0;">Part 110 (Sheen Rule) &amp; Part 112 (SPCC)</span></th>
+        <th class="azt inv-azcol" style="min-width:195px;display:none;">&#x1F7E0; AZ threshold / trigger<br><span style="font-weight:400;font-size:9px;text-transform:none;letter-spacing:0;">(ARS &sect;49-128 / &sect;49-1004 / ADEQ)</span></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="grp"><td colspan="6">Petroleum fuel &amp; oils</td></tr>
+      <!-- Diesel -->
+      <tr>
+        <td>Diesel fuel</td>
+        <td><span class="mono">C10&ndash;C15 hydrocarbons</span></td>
+        <td>Backup generators</td>
+        <td><span class="rqnone">Not listed on any federal hazardous substance list</span></td>
+        <td><div class="tc"><div class="tcb"><span class="b bbl">Nav. waters</span><span class="b btl">Shorelines</span><span class="b bpu">MS4</span></div>
+          <div class="tcr"><span class="tcl">Part 110 (Sheen Rule)</span><span class="tcv">Any qty &mdash; sheen/discoloration on navigable waters or shorelines</span></div>
+          <div class="tcr"><span class="tcl">Part 112 (SPCC)</span><span class="tcv">&gt;1,000 gal single event OR &gt;42 gal in each of 2 events/12 mo</span></div></div></td>
+        <td class="aztd inv-azcol"><ul class="azl"><li>Any quantity reaching any AZ waterway</li><li>UST: release to soil/groundwater &mdash; 24 hrs (ARS &sect;49-1004)<span class="sn">Exception: &le;25 gal contained &amp; cleaned within 24 hrs</span></li></ul></td>
+      </tr>
+      <!-- Engine oil -->
+      <tr>
+        <td>Engine lubricating oil</td>
+        <td><span class="mono">Hydrotreated mineral oil</span></td>
+        <td>Generator lubrication</td>
+        <td><span class="rqnone">Not listed on any federal hazardous substance list</span></td>
+        <td><div class="tc"><div class="tcb"><span class="b bbl">Nav. waters</span><span class="b btl">Shorelines</span><span class="b bpu">MS4</span></div>
+          <div class="tcr"><span class="tcl">Part 110 (Sheen Rule)</span><span class="tcv">Same as diesel fuel above</span></div>
+          <div class="tcr"><span class="tcl">Part 112 (SPCC)</span><span class="tcv">Same as diesel fuel above</span></div></div></td>
+        <td class="aztd inv-azcol"><ul class="azl"><li>Any quantity reaching any AZ waterway</li><li>UST: release &mdash; 24 hrs (ARS &sect;49-1004)<span class="sn">Exception: &le;25 gal contained &amp; cleaned within 24 hrs</span></li></ul></td>
+      </tr>
+      <!-- Hydraulic -->
+      <tr>
+        <td>Hydraulic fluid</td>
+        <td><span class="mono">Polyalkylene glycol / mineral oil</span></td>
+        <td>Mechanical, CRAHs</td>
+        <td><span class="rqnone">Not listed on any federal hazardous substance list</span></td>
+        <td><div class="tc"><div class="tcb"><span class="b bbl">Nav. waters</span><span class="b btl">Shorelines</span><span class="b bpu">MS4</span></div>
+          <div class="tcr"><span class="tcl">Part 110 (Sheen Rule)</span><span class="tcv">Same as diesel fuel above</span></div>
+          <div class="tcr"><span class="tcl">Part 112 (SPCC)</span><span class="tcv">Same as diesel fuel above</span></div></div></td>
+        <td class="aztd inv-azcol"><ul class="azl"><li>Any quantity reaching any AZ waterway</li><li>UST: release &mdash; 24 hrs (ARS &sect;49-1004)<span class="sn">Exception: &le;25 gal contained &amp; cleaned within 24 hrs</span></li></ul></td>
+      </tr>
+      <!-- Transformer oil -->
+      <tr>
+        <td>Transformer oil</td>
+        <td><span class="mono">Naphthenic mineral oil</span></td>
+        <td>Transformer insulation</td>
+        <td><span class="rqnone">Not listed on any federal hazardous substance list</span></td>
+        <td><div class="tc"><div class="tcb"><span class="b bbl">Nav. waters</span><span class="b btl">Shorelines</span><span class="b bpu">MS4</span></div>
+          <div class="tcr"><span class="tcl">Part 110 (Sheen Rule)</span><span class="tcv">Same as diesel fuel above</span></div>
+          <div class="tcr"><span class="tcl">Part 112 (SPCC)</span><span class="tcv">Same as diesel fuel above</span></div></div></td>
+        <td class="aztd inv-azcol"><ul class="azl"><li>Any quantity reaching any AZ waterway</li><li>UST: release &mdash; 24 hrs (ARS &sect;49-1004)<span class="sn">Exception: &le;25 gal contained &amp; cleaned within 24 hrs</span></li></ul></td>
+      </tr>
+      <tr class="grp"><td colspan="6">HFC refrigerants</td></tr>
+      <tr>
+        <td>R-410A refrigerant</td><td><span class="mono">CH&#x2082;F&#x2082; / CHF&#x2082;CF&#x2083;</span></td><td>CRAC/CRAH, chillers</td>
+        <td><span class="rqnone">Not listed on any federal hazardous substance list</span></td>
+        <td><span class="b bgy">Not oil &mdash; Part 110/112 N/A</span></td>
+        <td class="aztd inv-azcol"><span class="azna">Gas at ambient conditions &mdash; waterway trigger N/A</span></td>
+      </tr>
+      <tr>
+        <td>R-134a refrigerant</td><td><span class="mono">CH&#x2082;FCF&#x2083;</span></td><td>CRAC/CRAH, chillers</td>
+        <td><span class="rqnone">Not listed on any federal hazardous substance list</span></td>
+        <td><span class="b bgy">Not oil &mdash; Part 110/112 N/A</span></td>
+        <td class="aztd inv-azcol"><span class="azna">Gas at ambient conditions &mdash; waterway trigger N/A</span></td>
+      </tr>
+      <tr>
+        <td>R-32 refrigerant</td><td><span class="mono">CH&#x2082;F&#x2082;</span></td><td>CRAC/CRAH, chillers</td>
+        <td><span class="rqnone">Not listed on any federal hazardous substance list</span></td>
+        <td><span class="b bgy">Not oil &mdash; Part 110/112 N/A</span></td>
+        <td class="aztd inv-azcol"><span class="azna">Gas at ambient conditions &mdash; waterway trigger N/A</span></td>
+      </tr>
+      <tr class="grp"><td colspan="6">Glycol solutions</td></tr>
+      <!-- Ethylene glycol -->
+      <tr>
+        <td>Ethylene glycol</td><td><span class="mono">C&#x2082;H&#x2086;O&#x2082;</span></td><td>Chilled water, antifreeze</td>
+        <td>
+          <div class="rqc">
+            <div class="rqr"><span class="rqs">CERCLA &sect;302.4</span><span class="rqv rqv-grn">5,000 lbs</span></div>
+            <div class="rq-sub">Code 3 &mdash; CAA &sect;112 Hazardous Air Pollutant</div>
+          </div>
+        </td>
+        <td><span class="b bgy">Not oil &mdash; Part 110/112 N/A</span></td>
+        <td class="aztd inv-azcol"><ul class="azl"><li>CERCLA RQ 5,000 lbs + ADEQ oral notification in addition to NRC (ARS &sect;49-128)</li><li>Any qty reaching AZ waterway also reportable</li></ul></td>
+      </tr>
+      <!-- Propylene glycol -->
+      <tr>
+        <td>Propylene glycol</td><td><span class="mono">C&#x2083;H&#x2088;O&#x2082;</span></td><td>Chilled water, antifreeze</td>
+        <td><span class="rqnone">Not listed on any federal hazardous substance list</span></td>
+        <td><span class="b bgy">Not oil &mdash; Part 110/112 N/A</span></td>
+        <td class="aztd inv-azcol"><ul class="azl"><li>No federal RQ</li><li>Any qty reaching AZ waterway reportable to ADEQ</li></ul></td>
+      </tr>
+      <tr class="grp"><td colspan="6">Battery chemicals &amp; materials</td></tr>
+      <!-- Sulfuric acid -->
+      <tr>
+        <td>Sulfuric acid</td><td><span class="mono">H&#x2082;SO&#x2084;</span></td><td>VRLA / flooded lead-acid UPS</td>
+        <td>
+          <div class="rqc">
+            <div class="rqr"><span class="rqs">CERCLA &sect;302.4</span><span class="rqv rqv-amb">1,000 lbs</span></div>
+            <div class="rq-sub">Code 1 &mdash; CWA &sect;311(b)(2) Hazardous Substance<br>Code 3 &mdash; CAA &sect;112 Hazardous Air Pollutant</div>
+            <div class="rqr" style="margin-top:4px;"><span class="rqs">EPCRA App.A TPQ</span><span class="rqv rqv-pur">1,000 lbs</span></div>
+          </div>
+        </td>
+        <td><span class="b bgy">Not oil &mdash; Part 110/112 N/A</span></td>
+        <td class="aztd inv-azcol"><ul class="azl"><li>CERCLA RQ 1,000 lbs + ADEQ oral notification in addition to NRC (ARS &sect;49-128)</li><li>Any qty reaching AZ waterway also reportable</li></ul></td>
+      </tr>
+      <!-- Lead -->
+      <tr>
+        <td>Lead</td><td><span class="mono">Pb</span></td><td>UPS lead-acid battery plates</td>
+        <td>
+          <div class="rqc">
+            <div class="rqr"><span class="rqs">CERCLA &sect;302.4</span><span class="rqv rqv-red">10 lbs</span></div>
+            <div class="rq-sub">Code 2 &mdash; CWA &sect;307(a) Toxic Pollutant</div>
+            <div class="rq-cpd"><em>Lead compounds</em> (Code 1 &mdash; CWA &sect;311(b)(2) Hazardous Substance): 1&ndash;10 lbs, varies by compound &mdash; see Regulated Substance Lists tab</div>
+          </div>
+        </td>
+        <td><span class="b bgy">Not oil &mdash; Part 110/112 N/A</span></td>
+        <td class="aztd inv-azcol"><ul class="azl"><li>CERCLA RQ 10 lbs + ADEQ oral notification in addition to NRC (ARS &sect;49-128)</li><li>Any qty reaching AZ waterway also reportable</li></ul></td>
+      </tr>
+      <!-- Potassium hydroxide -->
+      <tr>
+        <td>Potassium hydroxide</td><td><span class="mono">KOH</span></td><td>Ni-Cd backup batteries</td>
+        <td>
+          <div class="rqc">
+            <div class="rqr"><span class="rqs">CERCLA &sect;302.4</span><span class="rqv rqv-amb">1,000 lbs</span></div>
+            <div class="rq-sub">Code 1 &mdash; CWA &sect;311(b)(2) Hazardous Substance</div>
+          </div>
+        </td>
+        <td><span class="b bgy">Not oil &mdash; Part 110/112 N/A</span></td>
+        <td class="aztd inv-azcol"><ul class="azl"><li>CERCLA RQ 1,000 lbs + ADEQ oral notification in addition to NRC (ARS &sect;49-128)</li><li>Any qty reaching AZ waterway also reportable</li></ul></td>
+      </tr>
+      <!-- Lithium -->
+      <tr>
+        <td>Lithium compounds</td><td><span class="mono">LiCoO&#x2082; / LiFePO&#x2084;</span></td><td>Li-ion UPS batteries</td>
+        <td><span class="rqnone">Not listed on any federal hazardous substance list</span></td>
+        <td><span class="b bgy">Not oil &mdash; Part 110/112 N/A</span></td>
+        <td class="aztd inv-azcol"><ul class="azl"><li>No federal RQ</li><li>Any qty reaching AZ waterway reportable to ADEQ</li></ul></td>
+      </tr>
+      <tr class="grp"><td colspan="6">Immersion cooling fluids</td></tr>
+      <!-- Dielectric -->
+      <tr>
+        <td>Dielectric cooling fluid</td><td><span class="mono">Perfluorocarbon / HFE blend</span></td><td>Immersion cooling</td>
+        <td><span class="rqnone">Not listed on any federal hazardous substance list</span></td>
+        <td><span class="b bgy">Not oil &mdash; Part 110/112 N/A</span></td>
+        <td class="aztd inv-azcol"><ul class="azl"><li>No federal RQ</li><li>Any qty reaching AZ waterway reportable to ADEQ</li></ul></td>
+      </tr>
+      <!-- Mineral oil -->
+      <tr>
+        <td>Mineral oil (immersion)</td><td><span class="mono">Hydrotreated mineral oil</span></td><td>Immersion cooling</td>
+        <td><span class="rqnone">Not listed on any federal hazardous substance list</span></td>
+        <td><div class="tc"><div class="tcb"><span class="b bbl">Nav. waters</span><span class="b btl">Shorelines</span><span class="b bpu">MS4</span></div>
+          <div class="tcr"><span class="tcl">Part 110 (Sheen Rule)</span><span class="tcv">Same as diesel fuel above</span></div>
+          <div class="tcr"><span class="tcl">Part 112 (SPCC)</span><span class="tcv">Same as diesel fuel above</span></div></div></td>
+        <td class="aztd inv-azcol"><ul class="azl"><li>Any quantity reaching any AZ waterway</li><li>UST: release &mdash; 24 hrs (ARS &sect;49-1004)<span class="sn">Exception: &le;25 gal contained &amp; cleaned within 24 hrs</span></li></ul></td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+  <div class="fn">
+    <strong>CERCLA &sect;302.4 Statutory Codes</strong> (source of CERCLA designation): <strong>1</strong> = CWA &sect;311(b)(2) Hazardous Substance &middot; <strong>2</strong> = CWA &sect;307(a) Toxic Pollutant &middot; <strong>3</strong> = CAA &sect;112 Hazardous Air Pollutant &middot; <strong>4</strong> = RCRA &sect;3001 Hazardous Waste. &nbsp;&middot;&nbsp;
+    <strong>EPCRA App.&nbsp;A TPQ</strong> = Extremely Hazardous Substance Threshold Planning Quantity (40 CFR Part 355, App.&nbsp;A). &nbsp;&middot;&nbsp;
+    Part 112 thresholds (1,000 gal / 42 gal) refer to oil reaching navigable waters or adjoining shorelines. MS4s are evaluated as conveyance pathways under SPCC applicability.
+  </div>
+  <div class="fn fn-az az-show" style="display:none;">
+    &#x1F7E0; <strong>Arizona:</strong> ADEQ&rsquo;s &ldquo;any quantity impacting a waterway&rdquo; rule applies to all liquid substances regardless of federal RQ. HFC refrigerants are exempt as gases. ARS &sect;49-128 requires immediate <em>oral</em> ADEQ notification in addition to NRC &mdash; written follow-up (30 days) flows from EPCRA &sect;304(c).
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     SPILL REPORTING REQUIREMENTS
+════════════════════════════════════════════════════ -->
+<div id="pg-rpt" class="pg">
+  <div class="ph"><div class="pi pi-rpt">SR</div><div class="pttl grad-rpt">Spill Reporting Requirements</div></div>
+  <div class="ps">
+    <a href="https://www.epa.gov/emergency-response/oil-discharge-reporting-requirements" target="_blank">EPA Oil Discharge Reporting</a> &nbsp;&middot;&nbsp;
+    <a href="https://www.ecfr.gov/current/title-40/chapter-I/subchapter-D/part-110" target="_blank">Part 110</a> &nbsp;&middot;&nbsp;
+    <a href="https://www.ecfr.gov/current/title-40/chapter-I/subchapter-D/part-112" target="_blank">Part 112</a> &nbsp;&middot;&nbsp;
+    <a href="https://www.epa.gov/epcra/state-emergency-response-commissions-contacts" target="_blank">SERC Directory</a> &nbsp;&middot;&nbsp;
+    <a href="https://www.epa.gov/epcra/finding-your-lepc" target="_blank">Find your LEPC</a>
+  </div>
+  <div class="az-ban" id="rpt-ban">&#x1F335; <strong>Arizona layer active.</strong> Two AZ cards appended below. EPCRA &sect;304 card uses AZSERC with 30-day written follow-up deadline and azserc@azdeq.gov.</div>
+  <div class="dv"></div>
+
+  <!-- CERCLA 103 -->
+  <div class="rc rc-c1">
+    <div class="rh"><span class="rt rt-c1">CERCLA &sect;103</span><span class="rti">Hazardous Substance Release &mdash; 40 CFR &sect;302.6</span></div>
+    <table class="rtt"><colgroup><col style="width:14%"><col style="width:86%"></colgroup><tbody>
+      <tr><td>Trigger</td><td>Release at or above RQ within any 24-hour period</td></tr>
+      <tr><td>Who must report</td><td>Person in charge of the vessel or facility</td></tr>
+      <tr><td>Notify</td><td>
+        <div class="cb"><div class="cbe">National Response Center (NRC) &mdash; immediately</div><div class="cbd">Phone: <strong>1-800-424-8802</strong> (24/7) &middot; DC area: (202) 267-2675 &middot; <a href="https://nrc.uscg.mil" target="_blank">nrc.uscg.mil</a></div></div>
+      </td></tr>
+      <tr class="wr"><td>Written follow-up</td><td>Written report to the <strong>EPA Regional Administrator</strong> as soon as practicable. Content: facility name/location, max storage capacity, corrective actions taken, SPCC plan compliance status. (40 CFR &sect;302.6)</td></tr>
+      <tr><td>Timing</td><td>Initial notification: immediate. Written report: as soon as practicable.</td></tr>
+      <tr><td>Applicable substances</td><td>Ethylene glycol (5,000 lbs) &middot; Sulfuric acid (1,000 lbs) &middot; Potassium hydroxide (1,000 lbs) &middot; Lead (10 lbs)</td></tr>
+      <tr><td>Exemptions</td><td>Federally permitted releases; solid metal particles &gt;100 &micro;m; &lt;1,000 lb/24 hr NO&#x2093; from combustion</td></tr>
+    </tbody></table>
+  </div>
+
+  <!-- CERCLA 103(f)(2) -->
+  <div class="rc rc-c2">
+    <div class="rh"><span class="rt rt-c2">CERCLA &sect;103(f)(2)</span><span class="rti">Continuous Release &mdash; Reduced Reporting / 40 CFR &sect;302.8</span></div>
+    <table class="rtt"><colgroup><col style="width:14%"><col style="width:86%"></colgroup><tbody>
+      <tr><td>Applies when</td><td>Release is continuous (routine, without interruption) and stable in quantity and rate &mdash; qualifies for reduced reporting in lieu of per-release NRC notification</td></tr>
+      <tr><td>Notify</td><td>
+        <div class="cb"><div class="cbe">NRC &mdash; initial telephone: <strong>1-800-424-8802</strong></div></div>
+        <div class="cb" style="margin-top:5px;"><div class="cbe">SERC + LEPC of any state likely to be affected</div></div>
+      </td></tr>
+      <tr class="wr"><td>Written follow-up</td><td>
+        <strong>Initial written report to EPA HQ Office within 30 days</strong> of initial NRC call.<br><br>
+        <strong>First anniversary follow-up within 30 days</strong> of anniversary date &mdash; to EPA HQ Office.<br><br>
+        <strong>Annual written reports thereafter</strong> to EPA HQ Office + SERC + LEPC. Non-CERCLA EHS continuous releases: written to SERC and LEPC only. (40 CFR &sect;302.8)
+      </td></tr>
+      <tr><td>Timing</td><td>Initial telephone: immediate. Initial written: within 30 days. Annual: within 30 days of each anniversary date.</td></tr>
+      <tr><td>Note</td><td>Non-CERCLA EHS continuous releases: notify SERC and LEPC only &mdash; NOT the NRC</td></tr>
+    </tbody></table>
+  </div>
+
+  <!-- EPCRA 304 -->
+  <div class="rc rc-c3">
+    <div class="rh"><span class="rt rt-c3">EPCRA &sect;304</span><span class="rti">Emergency Release Notification &mdash; 40 CFR Part 355</span></div>
+    <table class="rtt"><colgroup><col style="width:14%"><col style="width:86%"></colgroup><tbody>
+      <tr><td>Trigger</td><td>Release of a CERCLA hazardous substance or EPCRA EHS at or above its RQ beyond the facility boundary</td></tr>
+      <tr><td>Notify</td><td>
+        <div class="cb"><div class="cbe">1. NRC &mdash; immediately: <strong>1-800-424-8802</strong></div></div>
+        <div class="cb" style="margin-top:5px;" id="serc-cb">
+          <div class="cbe" id="serc-lbl">2. SERC &mdash; immediately</div>
+          <div class="cbd" id="serc-det"><a href="https://www.epa.gov/epcra/state-emergency-response-commissions-contacts" target="_blank">epa.gov/epcra/state-emergency-response-commissions-contacts</a> &middot; EPCRA Info Center: <strong>1-800-424-9346</strong></div>
+        </div>
+        <div class="cb" style="margin-top:5px;"><div class="cbe">3. LEPC &mdash; immediately</div><div class="cbd"><a href="https://www.epa.gov/epcra/finding-your-lepc" target="_blank">epa.gov/epcra/finding-your-lepc</a></div></div>
+      </td></tr>
+      <tr class="wr" id="epcra-wr-fed"><td>Written follow-up</td><td>Written report to <strong>SERC and LEPC</strong> as soon as practicable. No federal format specified &mdash; email acceptable. Must include: updates to initial notice, response actions taken, medical attention advice. State deadlines vary. (EPCRA &sect;304(c))</td></tr>
+      <tr class="azwr az-show" id="epcra-wr-az" style="display:none;"><td>Written follow-up</td><td>Written report to <strong>AZSERC and local LEPC within 30 days</strong>. Email acceptable.<br><br>
+        Submit to AZSERC: <a href="mailto:azserc@azdeq.gov" style="color:var(--blue);">azserc@azdeq.gov</a> &middot; Phone: 602-771-4065<br>
+        Submit to local LEPC: see <a href="https://static.azdeq.gov/wpd/azserc/lepcmembers.pdf" target="_blank" style="color:var(--blue);">AZSERC LEPC Members (PDF)</a><br><br>
+        Source: <a href="https://azdeq.gov/emergency-release-reporting" target="_blank" style="color:var(--blue);">azdeq.gov/emergency-release-reporting</a>
+      </td></tr>
+      <tr><td>Timing</td><td>Initial notification: immediate. Written follow-up: within 30 days (AZ); as soon as practicable (federal floor).</td></tr>
+      <tr><td>Applicable substances</td><td>All CERCLA hazardous substances (ethylene glycol, sulfuric acid, potassium hydroxide, lead) and EPCRA EHS (sulfuric acid)</td></tr>
+    </tbody></table>
+  </div>
+
+  <!-- Part 110 -->
+  <div class="rc rc-c4">
+    <div class="rh"><span class="rt rt-c4">Oil &mdash; 40 CFR Part 110</span><span class="rti">Discharge of Oil &mdash; &ldquo;Sheen Rule&rdquo; &mdash; CWA &sect;311(b)(3)/(b)(4)</span></div>
+    <table class="rtt"><colgroup><col style="width:14%"><col style="width:86%"></colgroup><tbody>
+      <tr><td>Trigger (&sect;110.3)</td><td>Any oil discharge causing: (a) violation of water quality standards, OR (b) film/sheen/discoloration on navigable water or shoreline, OR (c) sludge/emulsion beneath surface or on shorelines. No minimum volume.</td></tr>
+      <tr><td>Notify</td><td><div class="cb"><div class="cbe">National Response Center (NRC) &mdash; immediately</div><div class="cbd">Phone: <strong>1-800-424-8802</strong> (24/7) &middot; <a href="https://nrc.uscg.mil" target="_blank">nrc.uscg.mil</a></div></div></td></tr>
+      <tr class="wrnone"><td>Written follow-up</td><td><em style="color:var(--t3);">None required under 40 CFR Part 110. Telephone notification to NRC is the sole obligation. If the discharge also meets SPCC &sect;112.4 thresholds, that section&rsquo;s written requirements apply.</em></td></tr>
+      <tr><td>Timing</td><td>Immediately upon knowledge of discharge</td></tr>
+      <tr><td>Applicable substances</td><td>Diesel fuel &middot; Engine lubricating oil &middot; Hydraulic fluid &middot; Transformer oil &middot; Mineral oil (immersion)</td></tr>
+    </tbody></table>
+  </div>
+
+  <!-- Part 112 -->
+  <div class="rc rc-c5">
+    <div class="rh"><span class="rt rt-c5">Oil &mdash; 40 CFR Part 112 (SPCC)</span><span class="rti">Oil Pollution Prevention &mdash; SPCC Rule &mdash; &sect;112.4 Reporting</span></div>
+    <table class="rtt"><colgroup><col style="width:14%"><col style="width:86%"></colgroup><tbody>
+      <tr><td>Trigger (&sect;112.4)</td><td><strong>&gt;1,000 U.S. gallons</strong> in a single discharge, OR <strong>&gt;42 U.S. gallons</strong> in each of two discharges within any 12-month period &mdash; oil reaching navigable waters or adjoining shorelines</td></tr>
+      <tr><td>Notify</td><td>
+        <div class="cb"><div class="cbe">1. NRC &mdash; immediately: <strong>1-800-424-8802</strong></div></div>
+        <div class="cb" style="margin-top:5px;"><div class="cbe">2. State oil pollution control agency &mdash; simultaneously with EPA RA written report</div></div>
+      </td></tr>
+      <tr class="wr"><td>Written follow-up</td><td>Written report to the <strong>EPA Regional Administrator within 60 days</strong> of the discharge. Content: facility name/location, max storage capacity, corrective actions taken, SPCC plan compliance status. Submit simultaneously to the state oil pollution control agency. (40 CFR &sect;112.4(a))</td></tr>
+      <tr><td>Timing</td><td>NRC notification: immediate. Written report to EPA RA: within 60 days.</td></tr>
+      <tr><td>Applicable substances</td><td>Diesel fuel &middot; Engine lubricating oil &middot; Hydraulic fluid &middot; Transformer oil &middot; Mineral oil (immersion)</td></tr>
+    </tbody></table>
+  </div>
+
+  <!-- AZ Card 1 -->
+  <div class="rc rc-caz az-card" id="az-card-1">
+    <div class="rh"><span class="rt rt-az">&#x1F7E0; Arizona &mdash; ARS &sect;49-128</span><span class="rti">State Parallel Oral Notification &mdash; ADEQ &amp; LEPC (All CERCLA / EHS Releases)</span></div>
+    <table class="rtt"><colgroup><col style="width:14%"><col style="width:86%"></colgroup><tbody>
+      <tr><td>Authority</td><td>Arizona Revised Statutes &sect;49-128 &mdash; Emergency notification of reportable releases</td></tr>
+      <tr><td>Trigger</td><td>Release of a CERCLA-listed hazardous substance or EPCRA EHS at or above its reportable quantity</td></tr>
+      <tr><td>Notification type</td><td><strong>Oral only.</strong> ARS &sect;49-128 mandates immediate oral notification. No written follow-up requirement in the statute itself.</td></tr>
+      <tr><td>Notify</td><td>
+        <div class="cb cb-az"><div class="cbe">ADEQ Emergency Response &mdash; immediately (oral, in addition to NRC)</div><div class="cbd">Phone: <strong>(602) 771-2330</strong> (24/7) &middot; Toll-free: 1-800-234-5677<br><a href="https://azdeq.gov/emergency-release-reporting" target="_blank">azdeq.gov/emergency-release-reporting</a></div></div>
+        <div class="cb" style="margin-top:5px;"><div class="cbe">LEPC community emergency coordinator &mdash; immediately (oral)</div><div class="cbd"><a href="https://azdeq.gov/azserc" target="_blank">azdeq.gov/azserc</a> &middot; <a href="https://static.azdeq.gov/wpd/azserc/lepcmembers.pdf" target="_blank">AZSERC LEPC Members (PDF)</a></div></div>
+      </td></tr>
+      <tr class="azwr"><td>Written follow-up</td><td>Obligation flows from federal <strong>EPCRA &sect;304(c)</strong> &mdash; written report to AZSERC and local LEPC <strong>within 30 days</strong>.<br><br>Submit to AZSERC: <a href="mailto:azserc@azdeq.gov" style="color:var(--blue);">azserc@azdeq.gov</a> &middot; Phone: 602-771-4065</td></tr>
+      <tr><td>Timing</td><td>Oral: immediately. Written follow-up: within 30 days.</td></tr>
+      <tr><td>Key distinction</td><td>Calling the NRC does <strong>not</strong> satisfy ARS &sect;49-128. Both are independent, parallel obligations. Applicable: Ethylene glycol &middot; Sulfuric acid &middot; Potassium hydroxide &middot; Lead.</td></tr>
+    </tbody></table>
+  </div>
+
+  <!-- AZ Card 2 -->
+  <div class="rc rc-caz az-card" id="az-card-2">
+    <div class="rh"><span class="rt rt-az">&#x1F7E0; Arizona &mdash; ADEQ / ARS &sect;49-1004</span><span class="rti">Any Quantity to Waterway &amp; Petroleum to Soil / Groundwater (All USTs)</span></div>
+    <table class="rtt"><colgroup><col style="width:14%"><col style="width:86%"></colgroup><tbody>
+      <tr><td>Authority</td><td>ADEQ general spill reporting policy (azdeq.gov/ReportSpill); A.R.S. &sect;49-1004 (UST petroleum releases)</td></tr>
+      <tr><td>Waterway trigger</td><td><strong>Any liquid substance, any quantity</strong> reaching an Arizona waterway must be reported to ADEQ.</td></tr>
+      <tr><td>UST petroleum trigger</td><td>Any confirmed or suspected petroleum release to soil or groundwater from a UST &mdash; report within <strong>24 hours</strong>. Exception: &le;25 gal contained and cleaned up within 24 hours.</td></tr>
+      <tr><td>Notify</td><td>
+        <div class="cb cb-az"><div class="cbe">ADEQ Emergency Response &mdash; immediately</div><div class="cbd">Phone: <strong>(602) 771-2330</strong> (24/7) &middot; <a href="https://azdeq.gov/ReportSpill" target="_blank">azdeq.gov/ReportSpill</a></div></div>
+        <div class="cb" style="margin-top:5px;"><div class="cbe">NRC &mdash; if federal Part 110 sheen rule is also triggered: <strong>1-800-424-8802</strong></div></div>
+      </td></tr>
+      <tr class="azwr"><td>Written follow-up</td><td><strong>UST releases &mdash; initial written Release Status Report within 14 calendar days.</strong> Content per ARS &sect;49-1004(C) and A.A.C. R18-12-260(C).<br><br><strong>90-day follow-up report</strong> within 90 calendar days of ADEQ&rsquo;s notification letter.</td></tr>
+      <tr><td>Gases</td><td>HFC refrigerants (R-410A, R-134a, R-32) &mdash; waterway trigger does not apply.</td></tr>
+      <tr><td>ADEQ guidance</td><td>&ldquo;If in doubt, report the spill.&rdquo; &mdash; ADEQ, azdeq.gov/ReportSpill</td></tr>
+    </tbody></table>
+    <div class="fn fn-az">&#x1F7E0; Arizona groundwater context: Desert soils provide minimal natural attenuation &mdash; ADEQ applies a precautionary approach to protect Arizona&rsquo;s aquifers.</div>
+  </div>
+
+  <!-- EPA Regional Offices -->
+  <div class="rc rc-c6">
+    <div class="rh"><span class="rt rt-c5">EPA Regional Offices</span><span class="rti">Contact by Region &mdash; CERCLA Written Reports &amp; SPCC &sect;112.4 Notifications</span></div>
+    <div class="regrid">
+      <div class="rcard"><div class="rn">Region 1</div><div class="rs">CT, MA, ME, NH, RI, VT</div><div class="rp">(617) 918-1111</div><div class="rs">Boston, MA</div></div>
+      <div class="rcard"><div class="rn">Region 2</div><div class="rs">NJ, NY, PR, VI</div><div class="rp">(212) 637-5000</div><div class="rs">New York, NY</div></div>
+      <div class="rcard"><div class="rn">Region 3</div><div class="rs">DC, DE, MD, PA, VA, WV</div><div class="rp">(215) 814-5000</div><div class="rs">Philadelphia, PA</div></div>
+      <div class="rcard"><div class="rn">Region 4</div><div class="rs">AL, FL, GA, KY, MS, NC, SC, TN</div><div class="rp">(404) 562-9900</div><div class="rs">Atlanta, GA</div></div>
+      <div class="rcard"><div class="rn">Region 5</div><div class="rs">IL, IN, MI, MN, OH, WI</div><div class="rp">(312) 353-2000</div><div class="rs">Chicago, IL</div></div>
+      <div class="rcard"><div class="rn">Region 6</div><div class="rs">AR, LA, NM, OK, TX</div><div class="rp">(214) 665-2200</div><div class="rs">Dallas, TX</div></div>
+      <div class="rcard"><div class="rn">Region 7</div><div class="rs">IA, KS, MO, NE</div><div class="rp">(913) 551-7003</div><div class="rs">Lenexa, KS</div></div>
+      <div class="rcard"><div class="rn">Region 8</div><div class="rs">CO, MT, ND, SD, UT, WY</div><div class="rp">(303) 312-6312</div><div class="rs"><a href="mailto:r8eisc@epa.gov" style="color:var(--blue);">r8eisc@epa.gov</a></div></div>
+      <div class="rcard"><div class="rn">Region 9</div><div class="rs">AZ, CA, HI, NV, GU, AS, MP</div><div class="rp">(415) 947-8000</div><div class="rs">Toll-free: (866) EPA-WEST</div></div>
+      <div class="rcard"><div class="rn">Region 10</div><div class="rs">AK, ID, OR, WA</div><div class="rp">(206) 553-1200</div><div class="rs">Seattle, WA</div></div>
+    </div>
+    <div class="fn fn-am">EPA HQ: (202) 564-4700 &nbsp;&middot;&nbsp; EPCRA Info Center: 1-800-424-9346 &nbsp;&middot;&nbsp; <a href="https://www.epa.gov/epcra/state-emergency-response-commissions-contacts" target="_blank" style="color:var(--blue);">SERC Directory</a> &nbsp;&middot;&nbsp; <a href="https://www.epa.gov/epcra/finding-your-lepc" target="_blank" style="color:var(--blue);">LEPC Finder</a></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     REGULATED SUBSTANCE LISTS
+════════════════════════════════════════════════════ -->
+<div id="pg-cer" class="pg">
+  <div class="ph"><div class="pi pi-cer">RL</div><div class="pttl grad-cer">Regulated Substance Lists</div></div>
+  <div class="ps">All four tables filtered to data center facility substances.</div>
+  <div class="az-ban" id="cer-ban">&#x1F335; <strong>Arizona layer active.</strong> Federal RQ and TPQ values unchanged. AZ layer adds AZSERC contact block to Appendix A.</div>
+  <div class="dv"></div>
+
+  <!-- 302.4 -->
+  <div class="ls">
+    <div class="lh"><div class="li li-bl">&sect;</div><div><div class="lttl">40 CFR &sect;302.4 &mdash; CERCLA Hazardous Substances &amp; Reportable Quantities</div><div class="lsub">Codes: 1 = CWA &sect;311(b)(2) &middot; 2 = CWA &sect;307(a) &middot; 3 = CAA &sect;112 &middot; 4 = RCRA &sect;3001 &middot; Source: <a href="https://www.law.cornell.edu/cfr/text/40/302.4" target="_blank">40 CFR &sect;302.4 &mdash; LII</a></div></div></div>
+    <div class="tw"><table class="lt2"><thead><tr><th>Hazardous substance</th><th>CASRN</th><th>Statutory code</th><th>Final RQ &mdash; lbs (kg)</th><th>DC source</th></tr></thead><tbody>
+      <tr><td>Ethylene glycol</td><td><span class="mono">107-21-1</span></td><td>3</td><td>5,000 (2,270)</td><td>Chilled water / antifreeze</td></tr>
+      <tr><td>Lead</td><td><span class="mono">7439-92-1</span></td><td>2</td><td>10 (4.54)</td><td>Lead-acid UPS battery plates</td></tr>
+      <tr><td>Lead compounds</td><td><span class="mono">N.A.</span></td><td>1</td><td>** (varies by compound)</td><td>Lead-acid UPS batteries</td></tr>
+      <tr><td>Potassium hydroxide</td><td><span class="mono">1310-58-3</span></td><td>1</td><td>1,000 (454)</td><td>Ni-Cd backup batteries</td></tr>
+      <tr><td>Sulfuric acid</td><td><span class="mono">7664-93-9</span></td><td>1, 3</td><td>1,000 (454)</td><td>VRLA / flooded lead-acid UPS</td></tr>
+    </tbody></table></div>
+    <div class="fn fn-tl">** Lead compounds: RQ varies by individual compound. See &sect;117.3 table below for per-compound values.</div>
+  </div>
+
+  <!-- 117.3 -->
+  <div class="ls">
+    <div class="lh"><div class="li li-tl">&sect;</div><div><div class="lttl">40 CFR &sect;117.3 &mdash; CWA &sect;311 Hazardous Substances &amp; Reportable Quantities</div><div class="lsub">Category codes: X = 1 lb &middot; A = 10 lbs &middot; C = 1,000 lbs &middot; Source: <a href="https://www.law.cornell.edu/cfr/text/40/117.3" target="_blank">40 CFR &sect;117.3 &mdash; LII</a></div></div></div>
+    <div class="tw"><table class="lt2"><thead><tr><th>Material</th><th>CASRN</th><th style="text-align:center;">Cat.</th><th>RQ &mdash; lbs (kg)</th><th>DC relevance</th></tr></thead><tbody>
+      <tr class="grp"><td colspan="5">Battery chemicals</td></tr>
+      <tr><td>Potassium hydroxide</td><td><span class="mono">1310-58-3</span></td><td style="text-align:center;"><span class="cat cat-c">C</span></td><td>1,000 (454)</td><td>Ni-Cd backup batteries</td></tr>
+      <tr><td>Sulfuric acid</td><td><span class="mono">7664-93-9</span></td><td style="text-align:center;"><span class="cat cat-c">C</span></td><td>1,000 (454)</td><td>VRLA / flooded lead-acid UPS</td></tr>
+      <tr class="grp"><td colspan="5">Lead compounds (lead-acid UPS)</td></tr>
+      <tr><td>Lead acetate</td><td><span class="mono">301-04-2</span></td><td style="text-align:center;"><span class="cat cat-a">A</span></td><td>10 (4.54)</td><td>Lead-acid battery component</td></tr>
+      <tr><td>Lead arsenate</td><td><span class="mono">7784-40-9</span></td><td style="text-align:center;"><span class="cat cat-x">X</span></td><td>1 (0.454)</td><td>Trace impurity &mdash; most stringent threshold</td></tr>
+      <tr><td>Lead chloride</td><td><span class="mono">7758-95-4</span></td><td style="text-align:center;"><span class="cat cat-a">A</span></td><td>10 (4.54)</td><td>Lead-acid battery component</td></tr>
+      <tr><td>Lead fluoborate</td><td><span class="mono">13814-96-5</span></td><td style="text-align:center;"><span class="cat cat-a">A</span></td><td>10 (4.54)</td><td>Electrolyte additive</td></tr>
+      <tr><td>Lead fluoride</td><td><span class="mono">7783-46-2</span></td><td style="text-align:center;"><span class="cat cat-a">A</span></td><td>10 (4.54)</td><td>Lead-acid battery component</td></tr>
+      <tr><td>Lead iodide</td><td><span class="mono">10101-63-0</span></td><td style="text-align:center;"><span class="cat cat-a">A</span></td><td>10 (4.54)</td><td>Lead-acid battery component</td></tr>
+      <tr><td>Lead nitrate</td><td><span class="mono">10099-74-8</span></td><td style="text-align:center;"><span class="cat cat-a">A</span></td><td>10 (4.54)</td><td>Lead-acid battery component</td></tr>
+      <tr><td>Lead stearate</td><td><span class="mono">1072-35-1</span></td><td style="text-align:center;"><span class="cat cat-a">A</span></td><td>10 (4.54)</td><td>Lead-acid battery component</td></tr>
+      <tr><td>Lead sulfate</td><td><span class="mono">7446-14-2</span></td><td style="text-align:center;"><span class="cat cat-a">A</span></td><td>10 (4.54)</td><td>Primary discharge product &mdash; lead-acid UPS</td></tr>
+      <tr><td>Lead sulfide</td><td><span class="mono">1314-87-0</span></td><td style="text-align:center;"><span class="cat cat-a">A</span></td><td>10 (4.54)</td><td>Lead-acid battery component</td></tr>
+      <tr><td>Lead thiocyanate</td><td><span class="mono">592-87-0</span></td><td style="text-align:center;"><span class="cat cat-a">A</span></td><td>10 (4.54)</td><td>Lead-acid battery component</td></tr>
+    </tbody></table></div>
+    <div class="fn" style="border-left-color:var(--teal);">Lead sulfate (Cat A, 10 lbs) is the primary discharge product of lead-acid UPS batteries. Lead arsenate (Cat X, 1 lb) carries the most stringent threshold in this table.</div>
+  </div>
+
+  <!-- App A -->
+  <div class="ls">
+    <div class="lh"><div class="li li-am">A</div><div><div class="lttl">40 CFR Part 355, Appendix A &mdash; Extremely Hazardous Substances (EHS) with Threshold Planning Quantities</div><div class="lsub">Source: <a href="https://www.law.cornell.edu/cfr/text/40/appendix-A_to_part_355" target="_blank">40 CFR Part 355, Appendix A &mdash; LII</a></div></div></div>
+    <div class="tw"><table class="lt2"><thead><tr><th>Substance</th><th>CASRN</th><th>TPQ (lbs)</th><th>RQ (lbs)</th><th>DC source</th><th>EPCRA &sect;302 threshold</th></tr></thead><tbody>
+      <tr><td>Sulfuric acid</td><td><span class="mono">7664-93-9</span></td><td>1,000</td><td>1,000</td><td>VRLA / flooded lead-acid UPS batteries</td><td>Notify SERC/LEPC if on-site quantity &ge; 1,000 lbs</td></tr>
+    </tbody></table></div>
+    <div class="azserc-blk" id="az-serc-block">
+      <div style="font-size:12.5px;font-weight:700;color:var(--az);margin-bottom:7px;">&#x1F7E0; Arizona &mdash; EPCRA &sect;302 Planning Contact</div>
+      <div class="cb cb-az" style="margin-top:0;"><div class="cbe">Arizona State Emergency Response Commission (AZSERC)</div><div class="cbd">Website: <a href="https://azdeq.gov/azserc" target="_blank">azdeq.gov/azserc</a><br>Phone: 602-771-4065 &middot; Email: <a href="mailto:azserc@azdeq.gov">azserc@azdeq.gov</a><br>LEPC Members: <a href="https://static.azdeq.gov/wpd/azserc/lepcmembers.pdf" target="_blank">LEPC Members PDF</a></div></div>
+    </div>
+    <div class="fn fn-am">Only sulfuric acid among the 15 DC inventory substances appears in the EPCRA Appendix A EHS list. The 1,000-lb TPQ triggers &sect;302 planning notification independent of any release event.</div>
+  </div>
+
+  <!-- App B -->
+  <div class="ls">
+    <div class="lh"><div class="li li-gy">B</div><div><div class="lttl">40 CFR Part 355, Appendix B &mdash; Radionuclides Designated as EHS</div><div class="lsub">Source: <a href="https://www.law.cornell.edu/cfr/text/40/appendix-B_to_part_355" target="_blank">40 CFR Part 355, Appendix B &mdash; LII</a></div></div></div>
+    <div class="es"><strong>No data center substances identified in Appendix B</strong>Appendix B designates radionuclides as EHS with TPQs in curies. None of the 15 DC inventory substances are radionuclides.</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     REFERENCES
+════════════════════════════════════════════════════ -->
+<div id="pg-ref" class="pg">
+  <div class="ph"><div class="pi pi-ref">RF</div><div class="pttl" style="color:var(--t1);">References</div></div>
+  <div class="ps">All web sources. <span class="bup">User provided</span> = supplied directly. <span class="baz-tag">Arizona</span> = state-specific sources.</div>
+  <div class="dv"></div>
+  <div class="scard">
+
+    <div class="rgrp"><div class="rgrpt">Federal Regulations</div>
+      <div class="rrow"><div class="rno">01</div><div class="rb"><div class="rttl2">40 CFR &sect;302.4 &mdash; Designation of Hazardous Substances <span class="bup">User provided</span></div><a class="rurl" href="https://www.law.cornell.edu/cfr/text/40/302.4" target="_blank">https://www.law.cornell.edu/cfr/text/40/302.4</a><div class="rdsc">Cornell Law LII &mdash; CERCLA Table 302.4. Source for CERCLA &sect;302.4 RQ and statutory code entries in Chemical Inventory tab.</div></div></div>
+      <div class="rrow"><div class="rno">02</div><div class="rb"><div class="rttl2">40 CFR Part 110 &mdash; Discharge of Oil <span class="bup">User provided</span></div><a class="rurl" href="https://www.ecfr.gov/current/title-40/chapter-I/subchapter-D/part-110" target="_blank">https://www.ecfr.gov/current/title-40/chapter-I/subchapter-D/part-110</a><div class="rdsc">eCFR &mdash; CWA &sect;311 &ldquo;Sheen Rule.&rdquo; NRC telephone notification only &mdash; no written follow-up required under Part 110.</div></div></div>
+      <div class="rrow"><div class="rno">03</div><div class="rb"><div class="rttl2">40 CFR Part 112 &mdash; Oil Pollution Prevention (SPCC Rule) <span class="bup">User provided</span></div><a class="rurl" href="https://www.ecfr.gov/current/title-40/chapter-I/subchapter-D/part-112" target="_blank">https://www.ecfr.gov/current/title-40/chapter-I/subchapter-D/part-112</a><div class="rdsc">eCFR &mdash; SPCC rule. &sect;112.4: 60-day written report to EPA Regional Administrator.</div></div></div>
+      <div class="rrow"><div class="rno">04</div><div class="rb"><div class="rttl2">40 CFR &sect;117.3 &mdash; CWA &sect;311 Reportable Quantities <span class="bup">User provided</span></div><a class="rurl" href="https://www.law.cornell.edu/cfr/text/40/117.3" target="_blank">https://www.law.cornell.edu/cfr/text/40/117.3</a><div class="rdsc">Cornell Law LII &mdash; Table 117.3 RQs. Source for per-compound lead RQ values in Regulated Substance Lists tab.</div></div></div>
+      <div class="rrow"><div class="rno">05</div><div class="rb"><div class="rttl2">40 CFR Part 355, Appendix A &mdash; EHS with Threshold Planning Quantities <span class="bup">User provided</span></div><a class="rurl" href="https://www.law.cornell.edu/cfr/text/40/appendix-A_to_part_355" target="_blank">https://www.law.cornell.edu/cfr/text/40/appendix-A_to_part_355</a><div class="rdsc">Cornell Law LII &mdash; EPCRA Appendix A EHS list. Source for EPCRA App. A TPQ entry (sulfuric acid) in Chemical Inventory tab.</div></div></div>
+      <div class="rrow"><div class="rno">06</div><div class="rb"><div class="rttl2">40 CFR Part 355, Appendix B &mdash; Radionuclides <span class="bup">User provided</span></div><a class="rurl" href="https://www.law.cornell.edu/cfr/text/40/appendix-B_to_part_355" target="_blank">https://www.law.cornell.edu/cfr/text/40/appendix-B_to_part_355</a><div class="rdsc">Cornell Law LII &mdash; No standard DC substances listed.</div></div></div>
+      <div class="rrow"><div class="rno">07</div><div class="rb"><div class="rttl2">40 CFR &sect;122.26 &mdash; Storm Water Discharges (NPDES / MS4)</div><a class="rurl" href="https://www.law.cornell.edu/cfr/text/40/122.26" target="_blank">https://www.law.cornell.edu/cfr/text/40/122.26</a><div class="rdsc">Cornell Law LII &mdash; NPDES MS4 definition. Basis for treating MS4s as conveyance pathways under SPCC applicability.</div></div></div>
+    </div>
+
+    <div class="rgrp"><div class="rgrpt">EPA Guidance &mdash; User Provided</div>
+      <div class="rrow"><div class="rno">08</div><div class="rb"><div class="rttl2">CERCLA and EPCRA Continuous Release Reporting <span class="bup">User provided</span></div><a class="rurl" href="https://www.epa.gov/epcra/cercla-and-epcra-continuous-release-reporting" target="_blank">https://www.epa.gov/epcra/cercla-and-epcra-continuous-release-reporting</a><div class="rdsc">Reduced reporting under CERCLA &sect;103(f)(2). Initial written report within 30 days to EPA HQ; annual reports thereafter.</div></div></div>
+      <div class="rrow"><div class="rno">09</div><div class="rb"><div class="rttl2">Hazardous Substance Designations and Release Notifications <span class="bup">User provided</span></div><a class="rurl" href="https://www.epa.gov/epcra/hazardous-substance-designations-and-release-notifications" target="_blank">https://www.epa.gov/epcra/hazardous-substance-designations-and-release-notifications</a><div class="rdsc">CERCLA hazardous substance designations and five RQ levels.</div></div></div>
+      <div class="rrow"><div class="rno">10</div><div class="rb"><div class="rttl2">EPCRA Emergency Release Notifications <span class="bup">User provided</span></div><a class="rurl" href="https://www.epa.gov/epcra/epcra-emergency-release-notifications" target="_blank">https://www.epa.gov/epcra/epcra-emergency-release-notifications</a><div class="rdsc">&sect;304 emergency release notification requirements and written follow-up content requirements.</div></div></div>
+      <div class="rrow"><div class="rno">11</div><div class="rb"><div class="rttl2">Who Must Be Notified When a Release Occurs <span class="bup">User provided</span></div><a class="rurl" href="https://www.epa.gov/epcra/who-must-be-notified-when-release-occurs" target="_blank">https://www.epa.gov/epcra/who-must-be-notified-when-release-occurs</a><div class="rdsc">NRC, SERC, and LEPC as notification recipients for CERCLA and EPCRA releases.</div></div></div>
+      <div class="rrow"><div class="rno">12</div><div class="rb"><div class="rttl2">Oil Discharge Reporting Requirements <span class="bup">User provided</span></div><a class="rurl" href="https://www.epa.gov/emergency-response/oil-discharge-reporting-requirements" target="_blank">https://www.epa.gov/emergency-response/oil-discharge-reporting-requirements</a><div class="rdsc">Reporting under 40 CFR Part 110 (Sheen Rule) and Part 112 (SPCC). Part 112 &sect;112.4: 60-day written report to EPA RA.</div></div></div>
+      <div class="rrow"><div class="rno">13</div><div class="rb"><div class="rttl2">EPA Consolidated List of Lists <span class="bup">User provided</span></div><a class="rurl" href="https://www.epa.gov/epcra/consolidated-list-lists" target="_blank">https://www.epa.gov/epcra/consolidated-list-lists</a><div class="rdsc">CERCLA, EPCRA EHS, and CAA &sect;112(r) substances consolidated.</div></div></div>
+      <div class="rrow"><div class="rno">14</div><div class="rb"><div class="rttl2">Consolidated List of Lists &mdash; April 2025 <span class="bup">User provided</span><span class="bpdf">PDF</span></div><a class="rurl" href="https://www.epa.gov/system/files/documents/2025-04/consolidated-list-of-lists-updated-april-2025.pdf" target="_blank">https://www.epa.gov/system/files/documents/2025-04/consolidated-list-of-lists-updated-april-2025.pdf</a><div class="rdsc">EPA April 2025 edition &mdash; CERCLA RQs, EPCRA TPQs/RQs, and CAA &sect;112(r) TQs side-by-side.</div></div></div>
+      <div class="rrow"><div class="rno">15</div><div class="rb"><div class="rttl2">EPCRA &sect;304 State Contact Information <span class="bup">User provided</span></div><a class="rurl" href="https://www.epa.gov/epcra/state-contact-information-epcra-section-304-emergency-release-notification" target="_blank">https://www.epa.gov/epcra/state-contact-information-epcra-section-304-emergency-release-notification</a><div class="rdsc">State-by-state &sect;304 follow-up contacts. Confirms 30-day written follow-up deadline. Arizona: azserc@azdeq.gov.</div></div></div>
+    </div>
+
+    <div class="rgrp"><div class="rgrpt">EPA Guidance &mdash; Additional</div>
+      <div class="rrow"><div class="rno">16</div><div class="rb"><div class="rttl2">SPCC &mdash; MS4 Pathway Guidance</div><a class="rurl" href="https://www.epa.gov/oil-spills-prevention-and-preparedness-regulations/spill-prevention-control-and-countermeasure-19" target="_blank">https://www.epa.gov/oil-spills-prevention-and-preparedness-regulations/spill-prevention-control-and-countermeasure-19</a><div class="rdsc">Guidance confirming MS4s as conveyance pathways under SPCC applicability.</div></div></div>
+      <div class="rrow"><div class="rno">17</div><div class="rb"><div class="rttl2">EPA Mailing Addresses and Phone Numbers</div><a class="rurl" href="https://www.epa.gov/aboutepa/mailing-addresses-and-phone-numbers" target="_blank">https://www.epa.gov/aboutepa/mailing-addresses-and-phone-numbers</a><div class="rdsc">Official contact info for all 10 EPA Regional Offices.</div></div></div>
+    </div>
+
+    <div class="rgrp"><div class="rgrpt">EPA Contact &amp; Directory Sources</div>
+      <div class="rrow"><div class="rno">18</div><div class="rb"><div class="rttl2">State Emergency Response Commissions &mdash; Contacts</div><a class="rurl" href="https://www.epa.gov/epcra/state-emergency-response-commissions-contacts" target="_blank">https://www.epa.gov/epcra/state-emergency-response-commissions-contacts</a><div class="rdsc">SERC directory. Arizona SERC: Chris Nutter, nutter.chris@azdeq.gov, 602-771-4065.</div></div></div>
+      <div class="rrow"><div class="rno">19</div><div class="rb"><div class="rttl2">State Emergency Response Commissions &mdash; Overview</div><a class="rurl" href="https://www.epa.gov/epcra/state-emergency-response-commissions" target="_blank">https://www.epa.gov/epcra/state-emergency-response-commissions</a><div class="rdsc">SERC and TERC roles and responsibilities under EPCRA.</div></div></div>
+      <div class="rrow"><div class="rno">20</div><div class="rb"><div class="rttl2">Finding Your LEPC</div><a class="rurl" href="https://www.epa.gov/epcra/finding-your-lepc" target="_blank">https://www.epa.gov/epcra/finding-your-lepc</a><div class="rdsc">Guidance on locating LEPCs via the state SERC directory.</div></div></div>
+      <div class="rrow"><div class="rno">21</div><div class="rb"><div class="rttl2">Local Emergency Planning Committees &mdash; Overview</div><a class="rurl" href="https://www.epa.gov/epcra/local-emergency-planning-committees" target="_blank">https://www.epa.gov/epcra/local-emergency-planning-committees</a><div class="rdsc">LEPC roles and EPCRA Information Center contact (1-800-424-9346).</div></div></div>
+      <div class="rrow"><div class="rno">22</div><div class="rb"><div class="rttl2">National Response Center (NRC)</div><a class="rurl" href="https://nrc.uscg.mil" target="_blank">https://nrc.uscg.mil</a><div class="rdsc">U.S. Coast Guard &mdash; Federal 24/7 spill reporting center. Phone: 1-800-424-8802.</div></div></div>
+    </div>
+
+    <div class="rgrp"><div class="rgrpt">Arizona State Sources <span class="baz-tag">Arizona</span></div>
+      <div class="rrow"><div class="rno">23</div><div class="rb"><div class="rttl2">ADEQ &mdash; Report a Spill <span class="bup">User provided</span><span class="baz-tag">Arizona</span></div><a class="rurl" href="https://azdeq.gov/ReportSpill" target="_blank">https://azdeq.gov/ReportSpill</a><div class="rdsc">ADEQ general spill reporting. Source of the &ldquo;any quantity impacting a waterway&rdquo; rule.</div></div></div>
+      <div class="rrow"><div class="rno">24</div><div class="rb"><div class="rttl2">ADEQ &mdash; Emergency Release Reporting <span class="bup">User provided</span><span class="baz-tag">Arizona</span></div><a class="rurl" href="https://azdeq.gov/emergency-release-reporting" target="_blank">https://azdeq.gov/emergency-release-reporting</a><div class="rdsc">ADEQ EPCRA &sect;304 guidelines. Establishes 30-day written follow-up to AZSERC and local LEPC. Email to azserc@azdeq.gov acceptable.</div></div></div>
+      <div class="rrow"><div class="rno">25</div><div class="rb"><div class="rttl2">ARS &sect;49-128 &mdash; Emergency Notification of Reportable Releases <span class="bup">User provided</span><span class="baz-tag">Arizona</span></div><a class="rurl" href="https://www.azleg.gov/ars/49/00128.htm" target="_blank">https://www.azleg.gov/ars/49/00128.htm</a><div class="rdsc">Oral notification only &mdash; to ADEQ and LEPC. No written follow-up in the statute; 30-day obligation flows from EPCRA &sect;304(c).</div></div></div>
+      <div class="rrow"><div class="rno">26</div><div class="rb"><div class="rttl2">AZSERC LEPC Members Directory <span class="bup">User provided</span><span class="baz-tag">Arizona</span><span class="bpdf">PDF</span></div><a class="rurl" href="https://static.azdeq.gov/wpd/azserc/lepcmembers.pdf" target="_blank">https://static.azdeq.gov/wpd/azserc/lepcmembers.pdf</a><div class="rdsc">ADEQ / AZSERC &mdash; Arizona LEPC members directory.</div></div></div>
+      <div class="rrow"><div class="rno">27</div><div class="rb"><div class="rttl2">AZSERC &mdash; Arizona State Emergency Response Commission <span class="bup">User provided</span><span class="baz-tag">Arizona</span></div><a class="rurl" href="https://azdeq.gov/azserc" target="_blank">https://azdeq.gov/azserc</a><div class="rdsc">ADEQ AZSERC homepage. Email: azserc@azdeq.gov &middot; Phone: 602-771-4065. Arizona&rsquo;s SERC for EPCRA &sect;302 planning and &sect;304 release notification.</div></div></div>
+    </div>
+
+  </div>
+</div>
+
+</div><!-- end portal -->
+
+<script>
+function switchTab(id, el) {
+  document.querySelectorAll('.pg').forEach(function(p){ p.classList.remove('act'); });
+  document.querySelectorAll('.ni').forEach(function(n){ n.classList.remove('act'); });
+  document.getElementById('pg-' + id).classList.add('act');
+  el.classList.add('act');
+}
+
+function applyState(v) {
+  var isAZ = v === 'az';
+
+  // Badge
+  document.getElementById('SBadge').style.display = isAZ ? 'inline-block' : 'none';
+
+  // Banners
+  ['inv-ban','rpt-ban','cer-ban'].forEach(function(id){
+    var e = document.getElementById(id);
+    if (e) e.style.display = isAZ ? 'block' : 'none';
+  });
+
+  // AZ column headers and cells
+  document.querySelectorAll('.inv-azcol').forEach(function(el){
+    el.style.display = isAZ ? 'table-cell' : 'none';
+  });
+  document.querySelectorAll('.aztd').forEach(function(el){
+    el.style.display = isAZ ? 'table-cell' : 'none';
+  });
+
+  // Generic AZ-only show elements
+  document.querySelectorAll('.az-show').forEach(function(el){
+    el.style.display = isAZ ? 'block' : 'none';
+  });
+
+  // AZ spill reporting cards
+  document.querySelectorAll('.az-card').forEach(function(el){
+    el.style.display = isAZ ? 'block' : 'none';
+  });
+
+  // AZSERC block in App A
+  var sb = document.getElementById('az-serc-block');
+  if (sb) sb.style.display = isAZ ? 'block' : 'none';
+
+  // SERC swap in EPCRA 304 card
+  var sercLbl = document.getElementById('serc-lbl');
+  var sercDet = document.getElementById('serc-det');
+  if (isAZ) {
+    if (sercLbl) { sercLbl.style.color = 'var(--az)'; sercLbl.textContent = '2. AZSERC — Arizona State Emergency Response Commission'; }
+    if (sercDet) sercDet.innerHTML = '<a href="https://azdeq.gov/azserc" target="_blank">azdeq.gov/azserc</a> · Phone: <strong>602-771-4065</strong> · Email: <a href="mailto:azserc@azdeq.gov">azserc@azdeq.gov</a><br><a href="https://static.azdeq.gov/wpd/azserc/lepcmembers.pdf" target="_blank">AZSERC LEPC Members (PDF)</a>';
+  } else {
+    if (sercLbl) { sercLbl.style.color = ''; sercLbl.textContent = '2. SERC — immediately'; }
+    if (sercDet) sercDet.innerHTML = '<a href="https://www.epa.gov/epcra/state-emergency-response-commissions-contacts" target="_blank">epa.gov/epcra/state-emergency-response-commissions-contacts</a> · EPCRA Info Center: <strong>1-800-424-9346</strong>';
+  }
+
+  // Written follow-up row swap in EPCRA card
+  var wf = document.getElementById('epcra-wr-fed');
+  var wa = document.getElementById('epcra-wr-az');
+  if (wf) wf.style.display = isAZ ? 'none' : 'table-row';
+  if (wa) wa.style.display = isAZ ? 'table-row' : 'none';
+
+  // Inventory sub-line
+  var isub = document.getElementById('inv-sub');
+  if (isub) {
+    if (isAZ) {
+      isub.innerHTML = 'Federal: <a href="https://www.law.cornell.edu/cfr/text/40/302.4" target="_blank">CERCLA &sect;302.4</a> &nbsp;&middot;&nbsp; <a href="https://www.law.cornell.edu/cfr/text/40/appendix-A_to_part_355" target="_blank">EPCRA App. A</a> &nbsp;&middot;&nbsp; <a href="https://www.ecfr.gov/current/title-40/chapter-I/subchapter-D/part-110" target="_blank">Part 110</a> &amp; <a href="https://www.ecfr.gov/current/title-40/chapter-I/subchapter-D/part-112" target="_blank">Part 112</a> &nbsp;&middot;&nbsp; &#x1F7E0; AZ: <a href="https://azdeq.gov/emergency-release-reporting" target="_blank">ADEQ Emergency Release Reporting</a> &nbsp;&middot;&nbsp; <a href="https://www.azleg.gov/ars/49/00128.htm" target="_blank">ARS &sect;49-128</a>';
+    } else {
+      isub.innerHTML = 'CERCLA RQ: <a href="https://www.law.cornell.edu/cfr/text/40/302.4" target="_blank">40 CFR &sect;302.4</a> &nbsp;&middot;&nbsp; EHS TPQ: <a href="https://www.law.cornell.edu/cfr/text/40/appendix-A_to_part_355" target="_blank">Part 355 App. A</a> &nbsp;&middot;&nbsp; Oil spill: <a href="https://www.ecfr.gov/current/title-40/chapter-I/subchapter-D/part-110" target="_blank">Part 110</a> &amp; <a href="https://www.ecfr.gov/current/title-40/chapter-I/subchapter-D/part-112" target="_blank">Part 112</a>';
+    }
+  }
+}
+</script>
+</body>
+</html>
